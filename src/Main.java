@@ -1,72 +1,90 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
-
 public class Main {
     public static void main(String[] args) {
-        int count = 1; // Счетчик: количество верно указанных путей к файлу
-        for (;;){
-            System.out.println("Введите путь к файлу");
+        int count = 0;
+        int countstr = 0;
+        int max = 0;
+        int min = 1024;//максимальная длина строки
+        String YANDEX_BOT_NAME = "YandexBot";
+        String GOOGLE_BOT_NAME = "Googlebot";
+        Statistics statistics = new Statistics();
+        double yndx = 0, gogle = 0;
+        for (;;) {
+            System.out.println("Введите путь к файлу и нажмите <Enter>: ");
             String path = new Scanner(System.in).nextLine();
             File file = new File(path);
             boolean fileExists = file.exists();
+            boolean isDirectory = file.isDirectory();
             if (!fileExists) {
-                System.out.println("Файл не существует или введен неверный путь");
+                System.out.println("Указан неверный путь или путь к несуществующему файлу");
                 continue;
             }
-            boolean isDirectory = file.isDirectory();
-            if (!isDirectory){
-                System.out.println("Путь указан верно"+"\n"+count+" Верных путей");
+            if (isDirectory) {
+                System.out.println("Указан путь к папке, а не к файлу");
+            } else {
                 count++;
-            }
-            else
-            {
-                System.out.println("Файл не существует или введен неверный путь");
+                System.out.println("Путь указан верно" + " " + "Это файл номер " + count);
             }
             try {
                 FileReader fileReader = new FileReader(path);
                 BufferedReader reader = new BufferedReader(fileReader);
                 String line;
-                int sch = 0; // Счетчик: общее количество строк в файле
-                int min = 1024; // Самая короткая строка в файле
-                int max = 0; // Самая длинная строка в файле
-                double yandex = 0; //Доля Яндекс
-                double google = 0; //Доля Гугл
+
                 while ((line = reader.readLine()) != null) {
-
-                    if (line.length() > max) {
-                        max = line.length();
+                    countstr++;
+                    int length = line.length();
+                    //максимум_минимум символов в строке
+                    if (max < length) {
+                        max = length;
                     }
-
-                    if (max >= 1024) throw new RuntimeException("Строка имеет длину 1024 символа или более");
-
-                    if (line.length() < min) {
-                        min = line.length();
+                    if (max >= 1024) throw new RuntimeException("строка длиннее 1024 символов");
+                    if (min > length) {
+                        min = length;
                     }
-                    String[] parts1 = line.split(";");
-                    if (parts1.length >= 2) {
-                        String fragment = parts1[1];
-                        fragment = fragment.replaceAll(" ", "");
-                        String[] parts2 = fragment.split("/");
-                        if (parts2.length >= 2) {
-                            String fragment_rs = parts2[0];
-                            if (Objects.equals(fragment_rs, "YandexBot")) {
-                                yandex++;
+                    //максимум_минимум символов в строке
+                    List<LogEntry> logDataList = new ArrayList<>();
+
+                    LogEntry logData = new LogEntry(line);
+                    if (logData != null) {
+                        logDataList.add(logData);
+                        statistics.addEntry(logData);
+                    }
+                    if (logData.getUserAgentFullData() != null || logData.getUserAgentFullData().equals("-")) {
+                        UserAgent userAgent = new UserAgent(logData.getUserAgentFullData());
+                        String botNameFromUserAgent = userAgent.getBotName();
+                        if (botNameFromUserAgent != null) {
+                            if (LogEntry.checkUserAgent(botNameFromUserAgent, YANDEX_BOT_NAME)) {
+                                yndx++;
                             }
-                            if (Objects.equals(fragment_rs, "Googlebot")) {
-                                google++;
+
+                            if (LogEntry.checkUserAgent(botNameFromUserAgent, GOOGLE_BOT_NAME)) {
+                                gogle++;
                             }
                         }
                     }
-                        sch++;
-                    }
-                    System.out.println("Количество строк в файле: " + sch);
-                    System.out.println("Яндекс: "+ (yandex/sch));
-                    System.out.println("Гугл: "+ (google/sch));
+                }
+                statistics.getTrafficRate();
+                reader.close();
+            } catch (FileNotFoundException e) {
+                throw new IllegalArgumentException("Файл не найден");
+            } catch (IOException e) {
+                throw new NumberFormatException("Ошибка ввода или вывода");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
-            catch (Exception ex){
-                    System.out.println(ex.getMessage());
-            }
+
+            double totalBotCount = yndx + gogle;
+
+            System.out.println("Количество строк в файле: " + countstr);
+            System.out.println("Сумма YandexBot и Googlebot составляет: " + totalBotCount);
+            System.out.println("Количество запросов от " + YANDEX_BOT_NAME + " составляет : " + yndx);
+            System.out.println("Количество запросов от " + GOOGLE_BOT_NAME + " составляет : " + gogle);
+            System.out.println("Доля запросов от " + YANDEX_BOT_NAME + " составляет : " + String.format("%.2f", (yndx * 1.0 / totalBotCount)));
+            System.out.println("Доля запросов от " + GOOGLE_BOT_NAME + " составляет : " + String.format("%.2f", (gogle * 1.0 / totalBotCount)));
         }
     }
 }

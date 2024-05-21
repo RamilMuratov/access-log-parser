@@ -28,6 +28,7 @@ public class Main {
             } else {
                 count++;
                 System.out.println("Путь указан верно" + " " + "Это файл номер " + count);
+
             }
             try {
                 FileReader fileReader = new FileReader(path);
@@ -76,15 +77,35 @@ public class Main {
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-
             double totalBotCount = yndx + gogle;
 
             System.out.println("Количество строк в файле: " + countstr);
             System.out.println("Сумма YandexBot и Googlebot составляет: " + totalBotCount);
-            System.out.println("Количество запросов от " + YANDEX_BOT_NAME + " составляет : " + yndx);
-            System.out.println("Количество запросов от " + GOOGLE_BOT_NAME + " составляет : " + gogle);
-            System.out.println("Доля запросов от " + YANDEX_BOT_NAME + " составляет : " + String.format("%.2f", (yndx * 1.0 / totalBotCount)));
-            System.out.println("Доля запросов от " + GOOGLE_BOT_NAME + " составляет : " + String.format("%.2f", (gogle * 1.0 / totalBotCount)));
+            System.out.println("Количество запросов от " + YANDEX_BOT_NAME + " составляет: " + yndx);
+            System.out.println("Количество запросов от " + GOOGLE_BOT_NAME + " составляет: " + gogle);
+            System.out.println("Доля запросов от " + YANDEX_BOT_NAME + " составляет: " + String.format("%.2f", (yndx * 1.0 / totalBotCount)));
+            System.out.println("Доля запросов от " + GOOGLE_BOT_NAME + " составляет: " + String.format("%.2f", (gogle * 1.0 / totalBotCount)));
+
+            System.out.println("Трафик: ");
+            statistics.getTrafficRate();
+            System.out.println();
+
+            System.out.println("Доля операционной системы " + statistics.calculateOperationSystem());
+            System.out.println("Доля браузеров системы " + statistics.calculateBrowser());
+
+            System.out.println();
+            System.out.println("Несуществующие страницы " + statistics.getNonExistingPages());
+
+            System.out.println();
+            System.out.println("Расчета среднего количества посещений не ботами в час:" + statistics.calculateAverageNonBotVisitsHour());
+
+            System.out.println("Расчет среднего количества ошибочных запросов в час:" + statistics.calculateAverageErrorCodeVisitsHour());
+
+            System.out.println("Расчет среднего количества посещений на одного реального пользователя соответственно:" + statistics.calculateAverageVisitsPerRealUser());
+
+            System.out.println();
+            System.out.println("Пиковая посещаемость сайта (в секунду):" + statistics.calculatePeakNonBotVisitsPerSecond());
+            System.out.println("Максимальная посещаемость одним пользователем:" + statistics.calculateMaxVisitsPerRealUser());
         }
     }
 }

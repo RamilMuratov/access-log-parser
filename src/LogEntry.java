@@ -2,11 +2,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 public class LogEntry {
-    private String ipAddress; //IP-адрес
+    private String ipAddress; //IP-адрес клиента, который сделал запрос к серверу
     private String propertyOne; //Пропущенное свойство 1
     private String propertySecond; //Пропущенное свойство 2
     private LocalDateTime dateTime; //Дата и время запроса в квадратных скобках.
-    private HttpMethod requestMethod; //Метод запроса (в примере выше — GET) и путь, по которому сделан запрос.
+    private HttpMethods requestMethod; //Метод запроса (в примере выше — GET) и путь, по которому сделан запрос.
     private String requestPath; //Путь, по которому сделан запрос.
     private int responseCode; //Код HTTP-ответ
     private int dataSize; //Размер отданных данных в байтах
@@ -41,10 +41,10 @@ public class LogEntry {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
         this.dateTime = LocalDateTime.parse(dateTime, formatter);
     }
-    public HttpMethod getRequestMethod() {
+    public HttpMethods getRequestMethod() {
         return requestMethod;
     }
-    private void setRequestMethod(HttpMethod requestMethod) {
+    private void setRequestMethod(HttpMethods requestMethod) {
         this.requestMethod = requestMethod;
     }
     public String getRequestPath() {
@@ -92,9 +92,9 @@ public class LogEntry {
             setUserAgentFullData(extractUserAgent(logLine));
         }
     }
-    private static HttpMethod extractHttpMethod(String logLine) {
+    private static HttpMethods extractHttpMethod(String logLine) {
         String httpMethodsString = logLine.replace("\"", "");
-        HttpMethod httpMethods = HttpMethod.valueOf(httpMethodsString);
+        HttpMethods httpMethods = HttpMethods.valueOf(httpMethodsString);
         return httpMethods;
     }
     private static String extractUserAgent(String logLine) {
@@ -112,7 +112,12 @@ public class LogEntry {
     @Override
     public String toString() {
         return "logs.LogEntry{" +
-
+                "ipAddress='" + ipAddress + 'p' +
+                ", propertyOne='" + propertyOne + '\'' +
+                ", propertySecond='" + propertySecond + '\'' +
+                ", dateTime='" + dateTime + '\'' +
+                ", requestMethod='" + requestMethod + '\'' +
+                ", requestPath='" + requestPath + '\'' +
                 ", responseCode=" + responseCode +
                 ", dataSize=" + dataSize +
                 ", referer='" + referer + '\'' +
@@ -120,4 +125,4 @@ public class LogEntry {
                 '}';
     }
 }
-enum HttpMethod {GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE}
+enum HttpMethods {GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE}
